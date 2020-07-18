@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
+using MugenMvvmToolkit;
+using TestInterviewProject.Infrastructure;
 
 namespace TestInterviewProject
 {
@@ -13,5 +9,10 @@ namespace TestInterviewProject
     /// </summary>
     public partial class App : Application
     {
+        public App()
+        {
+            // ReSharper disable once AssignmentIsFullyDiscarded
+            _ = new BootstrapperEx(this, new AutofacContainer());
+        }
     }
 }
