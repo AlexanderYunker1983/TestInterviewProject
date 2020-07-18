@@ -158,6 +158,8 @@ namespace TestInterviewProject.Controls
 
             GL.EnableClientState(ArrayCap.VertexArray);
 
+            RenderBones();
+
             RenderJointUnderMouse();
 
             RenderJoints();
@@ -171,11 +173,19 @@ namespace TestInterviewProject.Controls
             GlControl.SwapBuffers();
         }
 
+        private void RenderBones()
+        {
+            GL.Color3(Color.Black);
+            GL.LineWidth(2.5f);
+            GL.VertexPointer(2, VertexPointerType.Double, 0, joints);
+            GL.DrawArrays(BeginMode.LineStrip, 0, joints.Length);
+        }
+
         private void RenderJointUnderMouse()
         {
             if (jointsUnderMousePointer.Any())
             {
-                GL.Color3(Color.Blue);
+                GL.Color3(Color.DeepSkyBlue);
                 GL.PointSize(15f);
                 GL.VertexPointer(2, VertexPointerType.Double, 0, jointsUnderMousePointer);
                 GL.DrawArrays(BeginMode.Points, 0, jointsUnderMousePointer.Length);
@@ -189,7 +199,7 @@ namespace TestInterviewProject.Controls
             GL.VertexPointer(2, VertexPointerType.Double, 0, joints);
             GL.DrawArrays(BeginMode.Points, 0, joints.Length);
             GL.Color3(Color.White);
-            GL.PointSize(8);
+            GL.PointSize(6);
             GL.VertexPointer(2, VertexPointerType.Double, 0, joints);
             GL.DrawArrays(BeginMode.Points, 0, joints.Length);
         }
