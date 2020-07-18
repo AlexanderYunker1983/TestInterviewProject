@@ -22,7 +22,13 @@ namespace TestInterviewProject.Controls
         public WorkPlane()
         {
             InitializeComponent();
-            joints = new []{new Vector2d(0.5, 0.5)};
+            joints = new []
+            {
+                new Vector2d(0.2, 0.3),
+                new Vector2d(0.5, 0.5),
+                new Vector2d(0.8, 0.4),
+                new Vector2d(0.1, 0.1),
+            };
             jointsUnderMousePointer = new Vector2d[0];
             BindOrUnbind(true);
         }
@@ -79,10 +85,11 @@ namespace TestInterviewProject.Controls
             var newyMouseCoord = e.Y;
 
             var currentYCoord = (GlControl.ClientSize.Height - newyMouseCoord) * relativeMouseY / 2 + 1.0;
+            currentYCoord = 1.0 - currentYCoord;
             var currentXCoord = -1.0 * newxMouseCoord * relativeMouseX / 2 + 1.0;
             currentXCoord = 1.0 - currentXCoord;
 
-            var deltaY = 10.0 * relativeMouseY / 2;
+            var deltaY = - 10.0 * relativeMouseY / 2;
             var deltaX = 10.0 * relativeMouseX / 2;
 
 
