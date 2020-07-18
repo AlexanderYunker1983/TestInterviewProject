@@ -5,9 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TestInterviewProject.Views.WorkPlane"
              xmlns:workPlane="clr-namespace:TestInterviewProject.ViewModels.WorkPlane"
+             xmlns:controls="clr-namespace:TestInterviewProject.Controls"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance workPlane:WorkPlaneViewModel}">
     <Grid>
-            
+        <controls:WorkPlane/>
     </Grid>
 </UserControl>
