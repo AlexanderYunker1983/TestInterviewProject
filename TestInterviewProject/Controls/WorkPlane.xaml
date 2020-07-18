@@ -7,7 +7,7 @@
              xmlns:openTk="clr-namespace:OpenTK;assembly=OpenTK.GLControl"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <WindowsFormsHost VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+    <WindowsFormsHost VerticalAlignment="Stretch" HorizontalAlignment="Stretch" x:Name="FormsHost">
         <openTk:GLControl Dock="Fill" x:Name="GlControl"/>
     </WindowsFormsHost>
 </UserControl>

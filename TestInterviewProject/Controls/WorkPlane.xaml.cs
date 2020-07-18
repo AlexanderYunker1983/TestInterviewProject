@@ -1,9 +1,12 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
+using System.Windows.Forms;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using UserControl = System.Windows.Controls.UserControl;
 
 namespace TestInterviewProject.Controls
 {
@@ -13,11 +16,90 @@ namespace TestInterviewProject.Controls
     public partial class WorkPlane : UserControl
     {
         protected Matrix4 LookAt = Matrix4.LookAt(0, 0, 0.50f, 0, 0, 0, 0, 2, 0);
+        private Vector2d[] joints;
+        private Vector2d[] jointsUnderMousePointer;
 
         public WorkPlane()
         {
             InitializeComponent();
+            joints = new []{new Vector2d(0.5, 0.5)};
+            jointsUnderMousePointer = new Vector2d[0];
+            BindOrUnbind(true);
+        }
 
+        private void BindOrUnbind(bool bind)
+        {
+            if (bind)
+            {
+                Unloaded += OnUnloded;
+                GlControl.MouseUp += OnMouseUp;
+                GlControl.MouseDown += OnMouseDown;
+                GlControl.MouseMove += OnMouseMove;
+                GlControl.MouseLeave += OnMouseLeave;
+            }
+            else
+            {
+                Unloaded -= OnUnloded;
+                GlControl.MouseUp -= OnMouseUp;
+                GlControl.MouseDown -= OnMouseDown;
+                GlControl.MouseMove -= OnMouseMove;
+                GlControl.MouseLeave -= OnMouseLeave;
+                
+                GlControl.ContextMenu = null;
+                GlControl.Dispose();
+
+            }
+        }
+
+        private void OnMouseLeave(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void OnMouseUp(object sender, MouseEventArgs e)
+        {
+            
+        }
+
+        private void OnMouseDown(object sender, MouseEventArgs e)
+        {
+            
+        }
+
+        private void OnMouseMove(object sender, MouseEventArgs e)
+        {
+            if (joints == null || !joints.Any())
+            {
+                return;
+            }
+            var relativeMouseX = 2.0 / GlControl.ClientSize.Width;
+            var relativeMouseY = -2.0 / GlControl.ClientSize.Height;
+
+            var newxMouseCoord = e.X;
+            var newyMouseCoord = e.Y;
+
+            var currentYCoord = (GlControl.ClientSize.Height - newyMouseCoord) * relativeMouseY / 2 + 1.0;
+            var currentXCoord = -1.0 * newxMouseCoord * relativeMouseX / 2 + 1.0;
+            currentXCoord = 1.0 - currentXCoord;
+
+            var deltaY = 10.0 * relativeMouseY / 2;
+            var deltaX = 10.0 * relativeMouseX / 2;
+
+
+            jointsUnderMousePointer = joints.Where(j =>
+                    Math.Abs(j.X - currentXCoord) <= Math.Abs(deltaX) &&
+                    Math.Abs(j.Y - currentYCoord) <= Math.Abs(deltaY))
+                .ToArray();
+            RenderCurrentScene();
+        }
+
+        private void OnUnloded(object sender, RoutedEventArgs e)
+        {
+            BindOrUnbind(false);
+            GlControl.Dispose();
+            FormsHost.Dispose();
+            GlControl = null;
+            FormsHost = null;
         }
 
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
@@ -39,11 +121,12 @@ namespace TestInterviewProject.Controls
             GL.NewList(1, ListMode.Compile);
             {
                 GL.Viewport(0, 0, GlControl.ClientSize.Width, GlControl.ClientSize.Height);
-                GL.ClearColor(Color.LightGray);
+                GL.ClearColor(Color.White);
                 GL.MatrixMode(MatrixMode.Modelview);
                 GL.LoadMatrix(ref LookAt);
                 GL.Translate(- 1.0, - 1.0, 0);
                 GL.Scale(2.0, 2.0, 0);
+                
 
                 GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
                 GL.Enable(EnableCap.Blend);
@@ -66,11 +149,42 @@ namespace TestInterviewProject.Controls
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
+            GL.EnableClientState(ArrayCap.VertexArray);
+
+            RenderJointUnderMouse();
+
+            RenderJoints();
+
+            GL.DisableClientState(ArrayCap.VertexArray);
+
             GL.Disable(EnableCap.Blend);
             GL.Disable(EnableCap.LineSmooth);
             GL.Disable(EnableCap.PointSmooth);
 
             GlControl.SwapBuffers();
+        }
+
+        private void RenderJointUnderMouse()
+        {
+            if (jointsUnderMousePointer.Any())
+            {
+                GL.Color3(Color.Blue);
+                GL.PointSize(15f);
+                GL.VertexPointer(2, VertexPointerType.Double, 0, jointsUnderMousePointer);
+                GL.DrawArrays(BeginMode.Points, 0, jointsUnderMousePointer.Length);
+            }
+        }
+
+        private void RenderJoints()
+        {
+            GL.Color3(Color.Black);
+            GL.PointSize(10f);
+            GL.VertexPointer(2, VertexPointerType.Double, 0, joints);
+            GL.DrawArrays(BeginMode.Points, 0, joints.Length);
+            GL.Color3(Color.White);
+            GL.PointSize(8);
+            GL.VertexPointer(2, VertexPointerType.Double, 0, joints);
+            GL.DrawArrays(BeginMode.Points, 0, joints.Length);
         }
     }
 }
