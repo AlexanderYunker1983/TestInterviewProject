@@ -60,6 +60,35 @@ namespace TestInterviewProject.Infrastructure.Impl
                 };
             }
 
+            if (jointIndex == 2)
+            {
+                var oldChains = chainList.ToList();
+                if (desiredJointPosition.Y > 0.15 + oldChains[1].Length)
+                {
+                    desiredJointPosition.Y = 0.15 + oldChains[1].Length;
+                }
+                if (desiredJointPosition.Y < 0.15 - oldChains[1].Length)
+                {
+                    desiredJointPosition.Y = 0.15 - oldChains[1].Length;
+                }
+
+                var angle = Math.Asin((desiredJointPosition.Y - 0.15) / oldChains[1].Length);
+                var x = desiredJointPosition.X - oldChains[1].Length * Math.Cos(angle);
+
+                chainList[0] = new Chain
+                {
+                    Length = oldChains[0].Length,
+                    Index = oldChains[0].Index,
+                    Coordinate = x
+                };
+                chainList[1] = new Chain
+                {
+                    Length = oldChains[1].Length,
+                    Index = oldChains[1].Index,
+                    Coordinate = angle
+                };
+            }
+
             return chainList;
         }
     }
