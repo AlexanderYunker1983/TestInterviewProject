@@ -12,20 +12,32 @@ namespace TestInterviewProject.Infrastructure.Impl
                 new Chain
                 {
                     Coordinate = 0.1,
-                    Index = 0,
                     Length = 0.05
                 },
                 new Chain
                 {
                     Coordinate = 0.5,
-                    Index = 1,
                     Length = 0.3
                 },
                 new Chain
                 {
                     Coordinate = 0,
-                    Index = 1,
                     Length = 0.3
+                },
+                new Chain
+                {
+                    Coordinate = 0,
+                    Length = 0.1
+                },
+                new Chain
+                {
+                    Coordinate = 0,
+                    Length = 0.1
+                },
+                new Chain
+                {
+                    Coordinate = 0,
+                    Length = 0.1
                 },
             };
 

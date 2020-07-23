@@ -89,28 +89,26 @@ namespace TestInterviewProject.Infrastructure.Impl
             var m1Koef = 0.05;
             var m2Koef = 0.05;
 
-            var coordsDelta = new double[3];
+            var coordsDelta = new double[oldChains.Count];
             coordsDelta[0] = (jointIndex < 2 ? 1 : 0.1) * (m1Koef * (desiredJointPosition.X - CalcLengthX(oldChains, jointIndex)) +
                                                  m2Koef * (desiredJointPosition.Y - CalcLengthY(oldChains, jointIndex)));
-            coordsDelta[1] =
-                -1 * (m1Koef * (desiredJointPosition.X - CalcLengthX(oldChains, jointIndex)) * oldChains[1].Length *
-                    Math.Sin(oldChains[1].Coordinate) - m2Koef *
-                    (desiredJointPosition.Y - CalcLengthY(oldChains, jointIndex)) * oldChains[1].Length *
-                    Math.Cos(oldChains[1].Coordinate));
-            coordsDelta[2] =
-                -1 * (m1Koef * (desiredJointPosition.X - CalcLengthX(oldChains, jointIndex)) * oldChains[2].Length *
-                    Math.Sin(oldChains[2].Coordinate) - m2Koef *
-                    (desiredJointPosition.Y - CalcLengthY(oldChains, jointIndex)) * oldChains[2].Length *
-                    Math.Cos(oldChains[2].Coordinate));
 
+            for (var index = 1; index < oldChains.Count; index++)
+            {
+                coordsDelta[index] =
+                    -1 * (m1Koef * (desiredJointPosition.X - CalcLengthX(oldChains, jointIndex)) * oldChains[index].Length *
+                        Math.Sin(oldChains[index].Coordinate) - m2Koef *
+                        (desiredJointPosition.Y - CalcLengthY(oldChains, jointIndex)) * oldChains[index].Length *
+                        Math.Cos(oldChains[index].Coordinate));
+            }
+            
             for (var index = 0; index < jointIndex; index++)
             {
                 var oldValue = oldChains[index];
                 oldChains[index] = new Chain
                 {
                     Coordinate = oldValue.Coordinate + coordsDelta[index],
-                    Length = oldValue.Length,
-                    Index = oldValue.Index
+                    Length = oldValue.Length
                 };
             }
 
