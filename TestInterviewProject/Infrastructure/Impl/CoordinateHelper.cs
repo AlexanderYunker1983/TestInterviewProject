@@ -46,7 +46,21 @@ namespace TestInterviewProject.Infrastructure.Impl
 
         public IEnumerable<Chain> CalculateAvailableChainPositions(IEnumerable<Chain> chains, Joint desiredJointPosition)
         {
-            return chains;
+            var chainList = chains.ToList();
+            var jointIndex = chainList.Count -  int.Parse(desiredJointPosition.Name);
+            
+            if (jointIndex == 0 || jointIndex == 1)
+            {
+                var oldValue = chainList[0];
+                chainList[0] = new Chain
+                {
+                    Length = oldValue.Length,
+                    Index = oldValue.Index,
+                    Coordinate = desiredJointPosition.X
+                };
+            }
+
+            return chainList;
         }
     }
 }
