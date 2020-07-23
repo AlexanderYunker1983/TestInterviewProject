@@ -161,11 +161,7 @@ namespace TestInterviewProject.Controls
                 return;
             }
 
-            if (selectedIndex != -1)
-            {
-                RenderCurrentScene();
-                return;
-            }
+            
             var relativeMouseX = 2.0 / GlControl.ClientSize.Width;
             var relativeMouseY = -2.0 / GlControl.ClientSize.Height;
 
@@ -176,6 +172,15 @@ namespace TestInterviewProject.Controls
             currentYCoord = 1.0 - currentYCoord;
             var currentXCoord = -1.0 * newxMouseCoord * relativeMouseX / 2 + 1.0;
             currentXCoord = 1.0 - currentXCoord;
+
+            if (selectedIndex != -1)
+            {
+                jointsUnderMousePointer = new Vector2d[0];
+                joints[selectedIndex].X = currentXCoord;
+                joints[selectedIndex].Y = currentYCoord;
+                RenderCurrentScene();
+                return;
+            }
 
             var deltaY = - 10.0 * relativeMouseY / 2;
             var deltaX = 10.0 * relativeMouseX / 2;
