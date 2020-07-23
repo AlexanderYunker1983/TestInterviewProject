@@ -59,7 +59,7 @@ namespace TestInterviewProject.Infrastructure.Impl
             {
                 for (int index = 1; index < jointIndex; index++)
                 {
-                    lengthMax += oldChains[1].Length;
+                    lengthMax += oldChains[index].Length;
                 }
             }
 
