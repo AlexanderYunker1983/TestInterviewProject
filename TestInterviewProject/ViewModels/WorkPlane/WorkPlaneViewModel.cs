@@ -1,31 +1,39 @@
 ﻿using System.Collections.Generic;
 using MugenMvvmToolkit.ViewModels;
+using TestInterviewProject.Infrastructure;
 using TestInterviewProject.Models;
 
 namespace TestInterviewProject.ViewModels.WorkPlane
 {
     public class WorkPlaneViewModel : ViewModelBase
     {
-        public List<Chain> Chains { get; set; } = new List<Chain>
+        private IEnumerable<Chain> chains;
+
+        private readonly IChainsBuilder chainsBuilder;
+
+        public WorkPlaneViewModel(IChainsBuilder chainsBuilder)
         {
-            new Chain
+            this.chainsBuilder = chainsBuilder;
+        }
+
+        protected override void OnInitialized()
+        {
+            Chains = chainsBuilder.GetStartChainsPosition();
+
+            base.OnInitialized();
+        }
+
+        public IEnumerable<Chain> Chains
+        {
+            get => chains;
+            set
             {
-                Coordinate = 0.1,
-                Index = 0,
-                Length = 0.05
-            },
-            new Chain
-            {
-                Coordinate = 0.5,
-                Index = 1,
-                Length = 0.3
-            },
-            new Chain
-            {
-                Coordinate = 0,
-                Index = 1,
-                Length = 0.3
-            },
-        };
+                if (!Equals(value, chains))
+                {
+                    chains = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
     }
 }

@@ -92,6 +92,8 @@
     <Compile Include="Controls\WorkPlane.xaml.cs">
       <DependentUpon>WorkPlane.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Infrastructure\IChainsBuilder.cs" />
+    <Compile Include="Infrastructure\Impl\DefaultChainBuilder.cs" />
     <Compile Include="Infrastructure\TestAppModule.cs" />
     <Compile Include="Models\Chain.cs" />
     <Compile Include="ViewModels\Main\MainViewModel.cs" />
