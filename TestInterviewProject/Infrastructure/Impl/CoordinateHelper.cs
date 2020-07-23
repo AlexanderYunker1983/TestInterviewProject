@@ -74,7 +74,7 @@ namespace TestInterviewProject.Infrastructure.Impl
 
             var oldDelta = 0.0;
             var delta = 1.0;
-            while (Math.Abs(oldDelta - delta) > 1e-4)
+            while (Math.Abs(oldDelta - delta) > 1e-6)
             {
                 oldDelta = delta;
                 chainList = CalculateByIteration(oldChains, desiredJointPosition, jointIndex);
@@ -86,11 +86,11 @@ namespace TestInterviewProject.Infrastructure.Impl
 
         private List<Chain> CalculateByIteration(List<Chain> oldChains, Joint desiredJointPosition, int jointIndex)
         {
-            var m1Koef = 0.05;
-            var m2Koef = 0.05;
+            var m1Koef = 0.5;
+            var m2Koef = 0.5;
 
             var coordsDelta = new double[oldChains.Count];
-            coordsDelta[0] = (jointIndex < 2 ? 1 : 0.1) * (m1Koef * (desiredJointPosition.X - CalcLengthX(oldChains, jointIndex)) +
+            coordsDelta[0] = 1 * (jointIndex < 2 ? 1 : 1e-2) * (m1Koef * (desiredJointPosition.X - CalcLengthX(oldChains, jointIndex)) +
                                                  m2Koef * (desiredJointPosition.Y - CalcLengthY(oldChains, jointIndex)));
 
             for (var index = 1; index < oldChains.Count; index++)
