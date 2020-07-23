@@ -104,8 +104,6 @@ namespace TestInterviewProject.Infrastructure.Impl
                 {
                     chainList = CalculateByIteration(oldChains, desiredJointPosition);
                 }
-                
-               
             }
 
             return chainList;
@@ -113,10 +111,10 @@ namespace TestInterviewProject.Infrastructure.Impl
 
         private List<Chain> CalculateByIteration(List<Chain> oldChains, Joint desiredJointPosition)
         {
-            var m1Koef = 5;
-            var m2Koef = 5;
+            var m1Koef = 0.1;
+            var m2Koef = 0.1;
 
-            var x0 = -1 * (m1Koef *(desiredJointPosition.X - CalcLengthX(oldChains)) + m2Koef * (desiredJointPosition.Y - CalcLengthY(oldChains)));
+            var x0 = 1 * (m1Koef *(desiredJointPosition.X - CalcLengthX(oldChains)) + m2Koef * (desiredJointPosition.Y - CalcLengthY(oldChains)));
             var phi1 = -1 * (m1Koef * (desiredJointPosition.X - CalcLengthX(oldChains)) * oldChains[1].Length * Math.Sin(oldChains[1].Coordinate) - m2Koef * (desiredJointPosition.Y - CalcLengthY(oldChains)) * oldChains[1].Length * Math.Cos(oldChains[1].Coordinate));
             var phi2 = -1 * (m1Koef * (desiredJointPosition.X - CalcLengthX(oldChains)) * oldChains[2].Length * Math.Sin(oldChains[2].Coordinate) - m2Koef * (desiredJointPosition.Y - CalcLengthY(oldChains)) * oldChains[2].Length * Math.Cos(oldChains[2].Coordinate));
 
@@ -125,7 +123,7 @@ namespace TestInterviewProject.Infrastructure.Impl
                 var oldValue = oldChains[index];
                 oldChains[index] = new Chain
                 {
-                    Coordinate = oldValue.Coordinate + (index == 0 ? 0 : index == 1 ? phi1 : phi2),
+                    Coordinate = oldValue.Coordinate + (index == 0 ? x0 : index == 1 ? phi1 : phi2),
                     Length = oldValue.Length,
                     Index = oldValue.Index
                 };
