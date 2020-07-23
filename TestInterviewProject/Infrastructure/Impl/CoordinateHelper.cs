@@ -49,81 +49,66 @@ namespace TestInterviewProject.Infrastructure.Impl
             var chainList = chains.ToList();
             var oldChains = chainList.ToList();
             var jointIndex = chainList.Count -  int.Parse(desiredJointPosition.Name);
-            
-            if (jointIndex == 0 || jointIndex == 1)
+            if (jointIndex < 1)
             {
-                var oldValue = chainList[0];
-                chainList[0] = new Chain
-                {
-                    Length = oldValue.Length,
-                    Index = oldValue.Index,
-                    Coordinate = desiredJointPosition.X
-                };
+                jointIndex = 1;
             }
 
-            if (jointIndex == 2)
+            var lengthMax = 0.0;
+            if (jointIndex > 1)
             {
-                if (desiredJointPosition.Y > 0.15 + oldChains[1].Length)
+                for (int index = 1; index < jointIndex; index++)
                 {
-                    desiredJointPosition.Y = 0.15 + oldChains[1].Length;
+                    lengthMax += oldChains[1].Length;
                 }
-                if (desiredJointPosition.Y < 0.15 - oldChains[1].Length)
-                {
-                    desiredJointPosition.Y = 0.15 - oldChains[1].Length;
-                }
-
-                var angle = Math.Asin((desiredJointPosition.Y - 0.15) / oldChains[1].Length);
-                var x = desiredJointPosition.X - oldChains[1].Length * Math.Cos(angle);
-
-                chainList[0] = new Chain
-                {
-                    Length = oldChains[0].Length,
-                    Index = oldChains[0].Index,
-                    Coordinate = x
-                };
-                chainList[1] = new Chain
-                {
-                    Length = oldChains[1].Length,
-                    Index = oldChains[1].Index,
-                    Coordinate = angle
-                };
             }
 
-            if (jointIndex == 3)
+            if (desiredJointPosition.Y > 0.15 + lengthMax)
             {
-                if (desiredJointPosition.Y > 0.15 + oldChains[1].Length + oldChains[2].Length)
-                {
-                    desiredJointPosition.Y = 0.15 + oldChains[1].Length + oldChains[2].Length;
-                }
-                if (desiredJointPosition.Y < 0.15 - oldChains[1].Length - oldChains[2].Length)
-                {
-                    desiredJointPosition.Y = 0.15 - oldChains[1].Length - oldChains[2].Length;
-                }
+                desiredJointPosition.Y = 0.15 + lengthMax;
+            }
+            if (desiredJointPosition.Y < 0.15 - lengthMax)
+            {
+                desiredJointPosition.Y = 0.15 - lengthMax;
+            }
 
-                for (int index = 0; index < 100; index++)
-                {
-                    chainList = CalculateByIteration(oldChains, desiredJointPosition);
-                }
+            var oldDelta = 0.0;
+            var delta = 1.0;
+            while (Math.Abs(oldDelta - delta) > 1e-4)
+            {
+                oldDelta = delta;
+                chainList = CalculateByIteration(oldChains, desiredJointPosition, jointIndex);
+                delta = CalculateDelta(oldChains, jointIndex);
             }
 
             return chainList;
         }
 
-        private List<Chain> CalculateByIteration(List<Chain> oldChains, Joint desiredJointPosition)
+        private List<Chain> CalculateByIteration(List<Chain> oldChains, Joint desiredJointPosition, int jointIndex)
         {
-            var m1Koef = 0.1;
-            var m2Koef = 0.1;
+            var m1Koef = 0.05;
+            var m2Koef = 0.05;
 
-            var x0 = 1 * (m1Koef *(desiredJointPosition.X - CalcLengthX(oldChains)) + m2Koef * (desiredJointPosition.Y - CalcLengthY(oldChains)));
-            var phi1 = -1 * (m1Koef * (desiredJointPosition.X - CalcLengthX(oldChains)) * oldChains[1].Length * Math.Sin(oldChains[1].Coordinate) - m2Koef * (desiredJointPosition.Y - CalcLengthY(oldChains)) * oldChains[1].Length * Math.Cos(oldChains[1].Coordinate));
-            var phi2 = -1 * (m1Koef * (desiredJointPosition.X - CalcLengthX(oldChains)) * oldChains[2].Length * Math.Sin(oldChains[2].Coordinate) - m2Koef * (desiredJointPosition.Y - CalcLengthY(oldChains)) * oldChains[2].Length * Math.Cos(oldChains[2].Coordinate));
+            var coordsDelta = new double[3];
+            coordsDelta[0] = (jointIndex < 2 ? 1 : 0.1) * (m1Koef * (desiredJointPosition.X - CalcLengthX(oldChains, jointIndex)) +
+                                                 m2Koef * (desiredJointPosition.Y - CalcLengthY(oldChains, jointIndex)));
+            coordsDelta[1] =
+                -1 * (m1Koef * (desiredJointPosition.X - CalcLengthX(oldChains, jointIndex)) * oldChains[1].Length *
+                    Math.Sin(oldChains[1].Coordinate) - m2Koef *
+                    (desiredJointPosition.Y - CalcLengthY(oldChains, jointIndex)) * oldChains[1].Length *
+                    Math.Cos(oldChains[1].Coordinate));
+            coordsDelta[2] =
+                -1 * (m1Koef * (desiredJointPosition.X - CalcLengthX(oldChains, jointIndex)) * oldChains[2].Length *
+                    Math.Sin(oldChains[2].Coordinate) - m2Koef *
+                    (desiredJointPosition.Y - CalcLengthY(oldChains, jointIndex)) * oldChains[2].Length *
+                    Math.Cos(oldChains[2].Coordinate));
 
-            for (var index = 0; index < oldChains.Count; index++)
+            for (var index = 0; index < jointIndex; index++)
             {
                 var oldValue = oldChains[index];
                 oldChains[index] = new Chain
                 {
-                    Coordinate = oldValue.Coordinate + (index == 0 ? x0 : index == 1 ? phi1 : phi2),
+                    Coordinate = oldValue.Coordinate + coordsDelta[index],
                     Length = oldValue.Length,
                     Index = oldValue.Index
                 };
@@ -132,15 +117,35 @@ namespace TestInterviewProject.Infrastructure.Impl
             return oldChains;
         }
 
-        private double CalcLengthX(List<Chain> oldChains)
+        private double CalculateDelta(List<Chain> oldChains, int jointIndex)
         {
-            var result = oldChains[0].Coordinate + oldChains[1].Length * Math.Cos(oldChains[1].Coordinate) + oldChains[2].Length * Math.Cos(oldChains[2].Coordinate);
+            var result = 0.0;
+            for (var index = 0; index < jointIndex; index++)
+            {
+                result += Math.Pow(oldChains[index].Coordinate, 2);
+            }
+
+            result *= 0.5;
             return result;
         }
 
-        private double CalcLengthY(List<Chain> oldChains)
+        private double CalcLengthX(List<Chain> oldChains, int jointIndex)
         {
-            var result = 0.15 + oldChains[1].Length * Math.Sin(oldChains[1].Coordinate) + oldChains[2].Length * Math.Sin(oldChains[2].Coordinate);
+            var result = 0.0;
+            for (var index = 0; index < jointIndex; index++)
+            {
+                result += index == 0 ? oldChains[index].Coordinate : oldChains[index].Length * Math.Cos(oldChains[index].Coordinate);
+            }
+            return result;
+        }
+
+        private double CalcLengthY(List<Chain> oldChains, int jointIndex)
+        {
+            var result = 0.0;
+            for (var index = 0; index < jointIndex; index++)
+            {
+                result += index == 0 ? 0.15 : oldChains[index].Length * Math.Sin(oldChains[index].Coordinate);
+            }
             return result;
         }
     }
