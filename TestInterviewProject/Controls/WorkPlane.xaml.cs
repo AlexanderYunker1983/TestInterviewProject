@@ -47,6 +47,15 @@ namespace TestInterviewProject.Controls
             }
         }
 
+        public static readonly DependencyProperty DesiredJointPositionProperty = DependencyProperty.Register(
+            "DesiredJointPosition", typeof(Joint), typeof(WorkPlane), new PropertyMetadata(default(Joint)));
+
+        public Joint DesiredJointPosition
+        {
+            get => (Joint) GetValue(DesiredJointPositionProperty);
+            set => SetValue(DesiredJointPositionProperty, value);
+        }
+
         private void UpdateChains()
         {
             updateMutex.WaitOne();
@@ -176,9 +185,14 @@ namespace TestInterviewProject.Controls
             if (selectedIndex != -1)
             {
                 jointsUnderMousePointer = new Vector2d[0];
-                joints[selectedIndex].X = currentXCoord;
-                joints[selectedIndex].Y = currentYCoord;
-                RenderCurrentScene();
+
+                DesiredJointPosition = new Joint
+                {
+                    X = currentXCoord,
+                    Y = currentYCoord,
+                    Name = selectedIndex.ToString()
+                };
+
                 return;
             }
 

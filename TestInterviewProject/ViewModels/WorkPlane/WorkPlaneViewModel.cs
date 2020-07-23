@@ -13,11 +13,16 @@ namespace TestInterviewProject.ViewModels.WorkPlane
 
         private readonly IChainsBuilder chainsBuilder;
         private readonly IEventAggregator eventAggregator;
+        private readonly ICoordinateHelper coordinateHelper;
+        private Joint desiredJointPosition;
 
-        public WorkPlaneViewModel(IChainsBuilder chainsBuilder, IEventAggregator eventAggregator)
+        public WorkPlaneViewModel(IChainsBuilder chainsBuilder, 
+            IEventAggregator eventAggregator, 
+            ICoordinateHelper coordinateHelper)
         {
             this.chainsBuilder = chainsBuilder;
             this.eventAggregator = eventAggregator;
+            this.coordinateHelper = coordinateHelper;
         }
 
         protected override void OnInitialized()
@@ -38,6 +43,20 @@ namespace TestInterviewProject.ViewModels.WorkPlane
                     OnPropertyChanged();
 
                     eventAggregator.Publish(this, new ChainPositionsChanged(value));
+                }
+            }
+        }
+
+        public Joint DesiredJointPosition
+        {
+            get => desiredJointPosition;
+            set
+            {
+                if (!Equals(value, desiredJointPosition))
+                {
+                    desiredJointPosition = value;
+                    OnPropertyChanged();
+                    Chains = coordinateHelper.CalculateAvailableChainPositions(Chains, desiredJointPosition);
                 }
             }
         }

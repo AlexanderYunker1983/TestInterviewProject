@@ -43,5 +43,10 @@ namespace TestInterviewProject.Infrastructure.Impl
             var result = joints.Select(j => new Vector2d(j.X, j.Y)).ToArray();
             return result;
         }
+
+        public IEnumerable<Chain> CalculateAvailableChainPositions(IEnumerable<Chain> chains, Joint desiredJointPosition)
+        {
+            return chains;
+        }
     }
 }
