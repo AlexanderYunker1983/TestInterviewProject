@@ -1,6 +1,6 @@
 [submodule "YLocalization"]
 	path = YLocalization
-	url = git@github.com:AlexanderYunker1983/YLocalization.git
+url=https://github.com/AlexanderYunker1983/YLocalization.git
 [submodule "YMugenExtensions"]
 	path = YMugenExtensions
-	url = git@github.com:AlexanderYunker1983/YMugenExtensions.git
+url=https://github.com/AlexanderYunker1983/YMugenExtensions.git
