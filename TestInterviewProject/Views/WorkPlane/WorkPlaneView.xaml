@@ -9,6 +9,6 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance workPlane:WorkPlaneViewModel}">
     <Grid>
-        <controls:WorkPlane/>
+        <controls:WorkPlane Chains="{Binding Chains}"/>
     </Grid>
 </UserControl>

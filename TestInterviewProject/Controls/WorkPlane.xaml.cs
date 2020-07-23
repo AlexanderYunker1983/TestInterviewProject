@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using TestInterviewProject.Models;
 using UserControl = System.Windows.Controls.UserControl;
 
 namespace TestInterviewProject.Controls
@@ -21,25 +24,72 @@ namespace TestInterviewProject.Controls
         private Vector2d[] jointsCarret;
         private Vector2d[] liner;
 
+        private List<Chain> currentChainState = new List<Chain>();
+
+        private readonly Mutex updateMutex = new Mutex();
+
+        public static readonly DependencyProperty ChainsProperty = DependencyProperty.Register(
+            "Chains", typeof(IEnumerable<Chain>), typeof(WorkPlane), new PropertyMetadata(default(IEnumerable<Chain>), OnChainsSet));
+
+        private static void OnChainsSet(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is WorkPlane workPlane)
+            {
+                workPlane.UpdateChains();
+            }
+        }
+
+        private void UpdateChains()
+        {
+            updateMutex.WaitOne();
+
+            currentChainState = Chains.ToList();
+
+            UpdateJoins();
+
+            updateMutex.ReleaseMutex();
+
+            RenderCurrentScene();
+        }
+
+        private void UpdateJoins()
+        {
+            joints = new Vector2d[currentChainState.Count + 1];
+
+            var baseCoordinate = currentChainState[0].Coordinate;
+
+            joints[joints.Length - 1] = new Vector2d(baseCoordinate, 0.1);
+            
+            jointsCarret = new[]
+            {
+                new Vector2d(baseCoordinate - 0.02, 0.12),
+                new Vector2d(baseCoordinate, 0.15),
+                new Vector2d(baseCoordinate + 0.02, 0.12),
+                new Vector2d(baseCoordinate + 0.02, 0.08),
+                new Vector2d(baseCoordinate - 0.02, 0.08),
+                new Vector2d(baseCoordinate - 0.02, 0.12),
+            };
+
+            joints[joints.Length - 2] = new Vector2d(baseCoordinate, 0.1 + currentChainState[0].Length);
+
+            for (var index = 1; index < currentChainState.Count; index++)
+            {
+                var xCoordinate = joints[joints.Length - 1 - index].X + currentChainState[index].Length * Math.Cos(currentChainState[index].Coordinate);
+                var yCoordinate = joints[joints.Length - 1 - index].Y + currentChainState[index].Length * Math.Sin(currentChainState[index].Coordinate);
+                joints[joints.Length - 2 - index] = new Vector2d(xCoordinate, yCoordinate);
+            }
+        }
+
+        public IEnumerable<Chain> Chains
+        {
+            get => (IEnumerable<Chain>) GetValue(ChainsProperty);
+            set => SetValue(ChainsProperty, value);
+        }
+
         public WorkPlane()
         {
             InitializeComponent();
-            joints = new []
-            {
-                new Vector2d(0.7, 0.5),
-                new Vector2d(0.5, 0.5),
-                new Vector2d(0.1, 0.15),
-                new Vector2d(0.1, 0.1),
-            };
-            jointsCarret = new[]
-            {
-                new Vector2d(0.08, 0.12),
-                new Vector2d(0.1, 0.15),
-                new Vector2d(0.12, 0.12),
-                new Vector2d(0.12, 0.08),
-                new Vector2d(0.08, 0.08),
-                new Vector2d(0.08, 0.12),
-            };
+            
             liner = new[]
             {
                 new Vector2d(0.0, 0.1),
@@ -92,6 +142,7 @@ namespace TestInterviewProject.Controls
         {
             if (joints == null || !joints.Any())
             {
+                jointsUnderMousePointer = new Vector2d[0];
                 return;
             }
             var relativeMouseX = 2.0 / GlControl.ClientSize.Width;
@@ -165,6 +216,8 @@ namespace TestInterviewProject.Controls
 
         private void RenderCurrentScene()
         {
+            updateMutex.WaitOne();
+
             GlControl.MakeCurrent();
             GlControl.VSync = false;  //Сделано для совместимости со старыми картами NVidia
 
@@ -173,6 +226,8 @@ namespace TestInterviewProject.Controls
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             GL.EnableClientState(ArrayCap.VertexArray);
+
+            RenderLiner();
 
             RenderCarret();
 
@@ -189,16 +244,17 @@ namespace TestInterviewProject.Controls
             GL.Disable(EnableCap.PointSmooth);
 
             GlControl.SwapBuffers();
+
+            updateMutex.ReleaseMutex();
         }
 
         private void RenderCarret()
         {
-            GL.Color3(Color.LightGray);
-            GL.LineWidth(1.5f);
-
-            GL.VertexPointer(2, VertexPointerType.Double, 0, liner);
-            GL.DrawArrays(BeginMode.LineStrip, 0, liner.Length);
-
+            if (jointsCarret == null || jointsCarret.Length == 0)
+            {
+                return;
+            }
+            
             GL.Color3(Color.Black);
             GL.LineWidth(2.5f);
 
@@ -206,8 +262,21 @@ namespace TestInterviewProject.Controls
             GL.DrawArrays(BeginMode.LineStrip, 0, jointsCarret.Length);
         }
 
+        private void RenderLiner()
+        {
+            GL.Color3(Color.LightGray);
+            GL.LineWidth(1.5f);
+
+            GL.VertexPointer(2, VertexPointerType.Double, 0, liner);
+            GL.DrawArrays(BeginMode.LineStrip, 0, liner.Length);
+        }
+
         private void RenderBones()
         {
+            if (joints == null || joints.Length == 0)
+            {
+                return;
+            }
             GL.Color3(Color.Black);
             GL.LineWidth(2.5f);
             GL.VertexPointer(2, VertexPointerType.Double, 0, joints);
@@ -227,6 +296,10 @@ namespace TestInterviewProject.Controls
 
         private void RenderJoints()
         {
+            if (joints == null || joints.Length == 0)
+            {
+                return;
+            }
             GL.Color3(Color.Black);
             GL.PointSize(10f);
             GL.VertexPointer(2, VertexPointerType.Double, 0, joints);

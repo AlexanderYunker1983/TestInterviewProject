@@ -93,6 +93,7 @@
       <DependentUpon>WorkPlane.xaml</DependentUpon>
     </Compile>
     <Compile Include="Infrastructure\TestAppModule.cs" />
+    <Compile Include="Models\Chain.cs" />
     <Compile Include="ViewModels\Main\MainViewModel.cs" />
     <Compile Include="ViewModels\Report\ReportViewModel.cs" />
     <Compile Include="ViewModels\WorkPlane\WorkPlaneViewModel.cs" />
