@@ -24,8 +24,11 @@ namespace TestInterviewProject.Controls
         protected Matrix4 LookAt = Matrix4.LookAt(0, 0, 0.50f, 0, 0, 0, 0, 2, 0);
         private Vector2d[] joints;
         private Vector2d[] jointsUnderMousePointer;
+        private Vector2d[] selectedJoint;
         private Vector2d[] jointsCarret;
         private Vector2d[] liner;
+
+        private int selectedIndex = -1;
 
         private readonly ICoordinateHelper coordinateHelper;
 
@@ -119,17 +122,35 @@ namespace TestInterviewProject.Controls
 
         private void OnMouseLeave(object sender, EventArgs e)
         {
-            
+            selectedIndex = -1;
         }
 
         private void OnMouseUp(object sender, MouseEventArgs e)
         {
-            
+            selectedIndex = -1;
         }
 
         private void OnMouseDown(object sender, MouseEventArgs e)
         {
-            
+            var oldValue = selectedIndex;
+            if (jointsUnderMousePointer != null && jointsUnderMousePointer.Any())
+            {
+                var selectedPoint = jointsUnderMousePointer[0];
+                for (var index = 0; index < joints.Length; index++)
+                {
+                    if (Math.Abs(joints[index].X - selectedPoint.X) < double.Epsilon &&
+                        Math.Abs(joints[index].Y - selectedPoint.Y) < double.Epsilon)
+                    {
+                        selectedIndex = index;
+                        break;
+                    }
+                }
+            }
+
+            if (selectedIndex != oldValue)
+            {
+                RenderCurrentScene();
+            }
         }
 
         private void OnMouseMove(object sender, MouseEventArgs e)
@@ -137,6 +158,12 @@ namespace TestInterviewProject.Controls
             if (joints == null || !joints.Any())
             {
                 jointsUnderMousePointer = new Vector2d[0];
+                return;
+            }
+
+            if (selectedIndex != -1)
+            {
+                RenderCurrentScene();
                 return;
             }
             var relativeMouseX = 2.0 / GlControl.ClientSize.Width;
@@ -231,6 +258,8 @@ namespace TestInterviewProject.Controls
 
             RenderJoints();
 
+            RenderSelectedJoint();
+
             GL.DisableClientState(ArrayCap.VertexArray);
 
             GL.Disable(EnableCap.Blend);
@@ -240,6 +269,19 @@ namespace TestInterviewProject.Controls
             GlControl.SwapBuffers();
 
             updateMutex.ReleaseMutex();
+        }
+
+        private void RenderSelectedJoint()
+        {
+            if (joints == null || selectedIndex < 0 || selectedIndex > joints.Length - 1)
+            {
+                return;
+            }
+            selectedJoint = new []{joints[selectedIndex]};
+            GL.Color3(Color.OrangeRed);
+            GL.PointSize(17f);
+            GL.VertexPointer(2, VertexPointerType.Double, 0, selectedJoint);
+            GL.DrawArrays(BeginMode.Points, 0, selectedJoint.Length);
         }
 
         private void RenderCarret()
