@@ -61,5 +61,12 @@ namespace TestInterviewProject.Models
                 }
             }
         }
+
+        public void Update(Joint joint)
+        {
+            X = joint.X;
+            Y = joint.Y;
+            Z = joint.Z;
+        }
     }
 }

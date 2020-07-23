@@ -6,9 +6,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
+using MugenMvvmToolkit;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using TestInterviewProject.Infrastructure;
 using TestInterviewProject.Models;
+using YLocalization;
 using UserControl = System.Windows.Controls.UserControl;
 
 namespace TestInterviewProject.Controls
@@ -23,6 +26,8 @@ namespace TestInterviewProject.Controls
         private Vector2d[] jointsUnderMousePointer;
         private Vector2d[] jointsCarret;
         private Vector2d[] liner;
+
+        private readonly ICoordinateHelper coordinateHelper;
 
         private List<Chain> currentChainState = new List<Chain>();
 
@@ -54,30 +59,17 @@ namespace TestInterviewProject.Controls
 
         private void UpdateJoins()
         {
-            joints = new Vector2d[currentChainState.Count + 1];
+            joints = coordinateHelper.GetVertexFromChains(currentChainState);
 
-            var baseCoordinate = currentChainState[0].Coordinate;
-
-            joints[joints.Length - 1] = new Vector2d(baseCoordinate, 0.1);
-            
             jointsCarret = new[]
             {
-                new Vector2d(baseCoordinate - 0.02, 0.12),
-                new Vector2d(baseCoordinate, 0.15),
-                new Vector2d(baseCoordinate + 0.02, 0.12),
-                new Vector2d(baseCoordinate + 0.02, 0.08),
-                new Vector2d(baseCoordinate - 0.02, 0.08),
-                new Vector2d(baseCoordinate - 0.02, 0.12),
+                new Vector2d(joints.Last().X - 0.02, 0.12),
+                new Vector2d(joints.Last().X, 0.15),
+                new Vector2d(joints.Last().X + 0.02, 0.12),
+                new Vector2d(joints.Last().X + 0.02, 0.08),
+                new Vector2d(joints.Last().X - 0.02, 0.08),
+                new Vector2d(joints.Last().X - 0.02, 0.12),
             };
-
-            joints[joints.Length - 2] = new Vector2d(baseCoordinate, 0.1 + currentChainState[0].Length);
-
-            for (var index = 1; index < currentChainState.Count; index++)
-            {
-                var xCoordinate = joints[joints.Length - 1 - index].X + currentChainState[index].Length * Math.Cos(currentChainState[index].Coordinate);
-                var yCoordinate = joints[joints.Length - 1 - index].Y + currentChainState[index].Length * Math.Sin(currentChainState[index].Coordinate);
-                joints[joints.Length - 2 - index] = new Vector2d(xCoordinate, yCoordinate);
-            }
         }
 
         public IEnumerable<Chain> Chains
@@ -89,7 +81,9 @@ namespace TestInterviewProject.Controls
         public WorkPlane()
         {
             InitializeComponent();
-            
+
+            coordinateHelper = ServiceProvider.IocContainer.Get<ICoordinateHelper>();
+
             liner = new[]
             {
                 new Vector2d(0.0, 0.1),

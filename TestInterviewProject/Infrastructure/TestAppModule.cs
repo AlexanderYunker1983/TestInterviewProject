@@ -21,6 +21,7 @@ namespace TestInterviewProject.Infrastructure
             locManager.AddAssembly("TestInterviewProject", "Properties.Resources");
 
             iocContainer.Bind<IChainsBuilder, DefaultChainBuilder>(DependencyLifecycle.SingleInstance);
+            iocContainer.Bind<ICoordinateHelper, CoordinateHelper>(DependencyLifecycle.SingleInstance);
 
             return true;
         }

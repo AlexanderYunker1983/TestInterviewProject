@@ -93,6 +93,8 @@
       <DependentUpon>WorkPlane.xaml</DependentUpon>
     </Compile>
     <Compile Include="Infrastructure\IChainsBuilder.cs" />
+    <Compile Include="Infrastructure\ICoordinateHelper.cs" />
+    <Compile Include="Infrastructure\Impl\CoordinateHelper.cs" />
     <Compile Include="Infrastructure\Impl\DefaultChainBuilder.cs" />
     <Compile Include="Infrastructure\TestAppModule.cs" />
     <Compile Include="Messages\ChainPositionsChanged.cs" />

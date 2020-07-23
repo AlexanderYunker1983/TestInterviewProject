@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using MugenMvvmToolkit;
 using MugenMvvmToolkit.Interfaces;
 using MugenMvvmToolkit.ViewModels;
+using TestInterviewProject.Infrastructure;
 using TestInterviewProject.Messages;
 using TestInterviewProject.Models;
 
@@ -13,10 +13,12 @@ namespace TestInterviewProject.ViewModels.Report
     public class ReportViewModel : ViewModelBase
     {
         private readonly IEventAggregator eventAggregator;
+        private readonly ICoordinateHelper coordinateHelper;
 
-        public ReportViewModel(IEventAggregator eventAggregator)
+        public ReportViewModel(IEventAggregator eventAggregator, ICoordinateHelper coordinateHelper)
         {
             this.eventAggregator = eventAggregator;
+            this.coordinateHelper = coordinateHelper;
 
             this.eventAggregator.Subscribe<ChainPositionsChanged>(OnChainPositionsChanged);
         }
@@ -53,14 +55,10 @@ namespace TestInterviewProject.ViewModels.Report
                 }
             }
 
-            Joints[0].X = Joints[1].X = chainList[0].Coordinate;
-            Joints[0].Y = 0.1;
-            Joints[1].Y = Joints[0].Y + chainList[0].Length;
-
-            for (var index = 1; index < chainList.Count; index++)
+            var joints = coordinateHelper.CalculateJoints(chainList);
+            for (var index = 0; index < joints.Count; index++)
             {
-                Joints[index + 1].X = Joints[index].X + chainList[index].Length * Math.Cos(chainList[index].Coordinate);
-                Joints[index + 1].Y = Joints[index].Y + chainList[index].Length * Math.Sin(chainList[index].Coordinate);
+                Joints[index].Update(joints[index]);
             }
         }
 
