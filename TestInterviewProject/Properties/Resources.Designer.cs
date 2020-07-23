@@ -61,6 +61,15 @@ namespace TestInterviewProject.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Узел.
+        /// </summary>
+        internal static string Name {
+            get {
+                return ResourceManager.GetString("Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon ProgramIcon {
@@ -76,6 +85,33 @@ namespace TestInterviewProject.Properties {
         internal static string ProgramTitle {
             get {
                 return ResourceManager.GetString("ProgramTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to X.
+        /// </summary>
+        internal static string X {
+            get {
+                return ResourceManager.GetString("X", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Y.
+        /// </summary>
+        internal static string Y {
+            get {
+                return ResourceManager.GetString("Y", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Z.
+        /// </summary>
+        internal static string Z {
+            get {
+                return ResourceManager.GetString("Z", resourceCulture);
             }
         }
     }

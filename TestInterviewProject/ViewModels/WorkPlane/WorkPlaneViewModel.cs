@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using MugenMvvmToolkit.Interfaces;
 using MugenMvvmToolkit.ViewModels;
 using TestInterviewProject.Infrastructure;
+using TestInterviewProject.Messages;
 using TestInterviewProject.Models;
 
 namespace TestInterviewProject.ViewModels.WorkPlane
@@ -10,10 +12,12 @@ namespace TestInterviewProject.ViewModels.WorkPlane
         private IEnumerable<Chain> chains;
 
         private readonly IChainsBuilder chainsBuilder;
+        private readonly IEventAggregator eventAggregator;
 
-        public WorkPlaneViewModel(IChainsBuilder chainsBuilder)
+        public WorkPlaneViewModel(IChainsBuilder chainsBuilder, IEventAggregator eventAggregator)
         {
             this.chainsBuilder = chainsBuilder;
+            this.eventAggregator = eventAggregator;
         }
 
         protected override void OnInitialized()
@@ -32,6 +36,8 @@ namespace TestInterviewProject.ViewModels.WorkPlane
                 {
                     chains = value;
                     OnPropertyChanged();
+
+                    eventAggregator.Publish(this, new ChainPositionsChanged(value));
                 }
             }
         }

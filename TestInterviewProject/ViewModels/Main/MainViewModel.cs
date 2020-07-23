@@ -18,8 +18,9 @@ namespace TestInterviewProject.ViewModels.Main
 
         private void InitializeSubViewModels()
         {
-            WorkPlaneViewModel = GetViewModel<WorkPlaneViewModel>();
             ReportViewModel = GetViewModel<ReportViewModel>();
+
+            WorkPlaneViewModel = GetViewModel<WorkPlaneViewModel>();
         }
     }
 }

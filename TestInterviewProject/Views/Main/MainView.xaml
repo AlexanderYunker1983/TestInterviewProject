@@ -14,7 +14,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto" MinWidth="200"/>
         </Grid.ColumnDefinitions>
 
         <ContentPresenter Grid.Column="0" Content="{ViewModelToViewBinding WorkPlaneViewModel}"/>

@@ -95,7 +95,9 @@
     <Compile Include="Infrastructure\IChainsBuilder.cs" />
     <Compile Include="Infrastructure\Impl\DefaultChainBuilder.cs" />
     <Compile Include="Infrastructure\TestAppModule.cs" />
+    <Compile Include="Messages\ChainPositionsChanged.cs" />
     <Compile Include="Models\Chain.cs" />
+    <Compile Include="Models\Joint.cs" />
     <Compile Include="ViewModels\Main\MainViewModel.cs" />
     <Compile Include="ViewModels\Report\ReportViewModel.cs" />
     <Compile Include="ViewModels\WorkPlane\WorkPlaneViewModel.cs" />
