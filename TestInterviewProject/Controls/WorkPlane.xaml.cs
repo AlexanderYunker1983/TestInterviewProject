@@ -18,16 +18,32 @@ namespace TestInterviewProject.Controls
         protected Matrix4 LookAt = Matrix4.LookAt(0, 0, 0.50f, 0, 0, 0, 0, 2, 0);
         private Vector2d[] joints;
         private Vector2d[] jointsUnderMousePointer;
+        private Vector2d[] jointsCarret;
+        private Vector2d[] liner;
 
         public WorkPlane()
         {
             InitializeComponent();
             joints = new []
             {
-                new Vector2d(0.2, 0.3),
+                new Vector2d(0.7, 0.5),
                 new Vector2d(0.5, 0.5),
-                new Vector2d(0.8, 0.4),
+                new Vector2d(0.1, 0.15),
                 new Vector2d(0.1, 0.1),
+            };
+            jointsCarret = new[]
+            {
+                new Vector2d(0.08, 0.12),
+                new Vector2d(0.1, 0.15),
+                new Vector2d(0.12, 0.12),
+                new Vector2d(0.12, 0.08),
+                new Vector2d(0.08, 0.08),
+                new Vector2d(0.08, 0.12),
+            };
+            liner = new[]
+            {
+                new Vector2d(0.0, 0.1),
+                new Vector2d(1, 0.1),
             };
             jointsUnderMousePointer = new Vector2d[0];
             BindOrUnbind(true);
@@ -158,6 +174,8 @@ namespace TestInterviewProject.Controls
 
             GL.EnableClientState(ArrayCap.VertexArray);
 
+            RenderCarret();
+
             RenderBones();
 
             RenderJointUnderMouse();
@@ -173,12 +191,27 @@ namespace TestInterviewProject.Controls
             GlControl.SwapBuffers();
         }
 
+        private void RenderCarret()
+        {
+            GL.Color3(Color.LightGray);
+            GL.LineWidth(1.5f);
+
+            GL.VertexPointer(2, VertexPointerType.Double, 0, liner);
+            GL.DrawArrays(BeginMode.LineStrip, 0, liner.Length);
+
+            GL.Color3(Color.Black);
+            GL.LineWidth(2.5f);
+
+            GL.VertexPointer(2, VertexPointerType.Double, 0, jointsCarret);
+            GL.DrawArrays(BeginMode.LineStrip, 0, jointsCarret.Length);
+        }
+
         private void RenderBones()
         {
             GL.Color3(Color.Black);
             GL.LineWidth(2.5f);
             GL.VertexPointer(2, VertexPointerType.Double, 0, joints);
-            GL.DrawArrays(BeginMode.LineStrip, 0, joints.Length);
+            GL.DrawArrays(BeginMode.LineStrip, 0, joints.Length - 1);
         }
 
         private void RenderJointUnderMouse()
