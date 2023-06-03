@@ -1,0 +1,32 @@
+﻿<Window x:Class="TestInterviewProject.Views.Main.MainView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TestInterviewProject.Views.Main"
+        xmlns:main="clr-namespace:TestInterviewProject.ViewModels.Main"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance main:MainViewModel}"
+        Title="{DataBinding '$i18n.ProgramTitle'}"
+        WindowStartupLocation="CenterScreen"
+        SizeToContent="WidthAndHeight"
+        MinWidth="640" MinHeight="480">
+    <Grid Margin="11">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto" MinWidth="200"/>
+        </Grid.ColumnDefinitions>
+
+        <ContentPresenter Grid.Column="0" Content="{ViewModelToViewBinding WorkPlaneViewModel}"/>
+        <GridSplitter Grid.Column="1"
+                      Background="DarkGray"
+                      ShowsPreview="True"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      ResizeDirection="Columns"
+                      Width="3"
+                      ResizeBehavior="PreviousAndNext"
+                      Panel.ZIndex="1"/>
+        <ContentPresenter Grid.Column="2" Content="{ViewModelToViewBinding ReportViewModel}"/>
+    </Grid>
+</Window>
